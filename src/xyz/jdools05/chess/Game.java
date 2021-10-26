@@ -137,57 +137,55 @@ public class Game {
             if (step.piece instanceof Queen || step.piece instanceof Bishop) return true;
         }
 
-        if (white) {
-            if (!(!(Math.max(tile.y+1, tile.x-1) > 7) || !(Math.min(tile.y+1, tile.x-1) < 0))) {
-                step = board[tile.y+1][tile.x-1];
-                if (!step.isEmpty && !step.piece.white && step.piece instanceof Pawn) return true;
+            if (!(!(Math.max(tile.y+(white ? -1 : 1), tile.x-1) > 7) || !(Math.min(tile.y+(white ? -1 : 1), tile.x-1) < 0))) {
+                step = board[tile.y+(white ? -1 : 1)]tile.x-1];
+                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Pawn) return true;
             }
 
-            if (!(Math.max(tile.y+1, tile.x+1) > 7)) {
-                step = board[tile.y+1][tile.x+1];
-                if (!step.isEmpty && !step.piece.white && step.piece instanceof Pawn) return true;
+            if (!(!(Math.max(tile.y+(white ? -1 : 1), tile.x+1) > 7) || !(Math.min(tile.y+(white ? -1 : 1), tile.x+1) < 0))) {
+                step = board[tile.y+(white ? -1 : 1)]tile.x+1];
+                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Pawn) return true;
             }
 
             if (!(Math.max(tile.y+2, tile.x+1) > 7)) {
                 step = board[tile.y+2][tile.x+1];
-                if (!step.isEmpty && !step.piece.white && step.piece instanceof Knight) return true;
+                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
             }
 
             if (!(Math.max(tile.y+1, tile.x+2) > 7)) {
                 step = board[tile.y+1][tile.x+2];
-                if (!step.isEmpty && !step.piece.white && step.piece instanceof Knight) return true;
+                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
             }
 
             if (!(!(Math.max(tile.y-1, tile.x+2) > 7) || !(Math.min(tile.y-1, tile.x+2) < 0))) {
                 step = board[tile.y-1][tile.x+2];
-                if (!step.isEmpty && !step.piece.white && step.piece instanceof Knight) return true;
+                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
             }
 
             if (!(!(Math.max(tile.y-2, tile.x+1) > 7) || !(Math.min(tile.y-2, tile.x+1) < 0))) {
                 step = board[tile.y-2][tile.x+1];
-                if (!step.isEmpty && !step.piece.white && step.piece instanceof Knight) return true;
+                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
             }
 
             if (!(!(Math.max(tile.y+2, tile.x-1) > 7) || !(Math.min(tile.y+2, tile.x-1) < 0))) {
                 step = board[tile.y+2][tile.x-1];
-                if (!step.isEmpty && !step.piece.white && step.piece instanceof Knight) return true;
+                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
             }
 
             if (!(!(Math.max(tile.y+1, tile.x-2) > 7) || !(Math.min(tile.y+1, tile.x-2) < 0))) {
                 step = board[tile.y+1][tile.x-2];
-                if (!step.isEmpty && !step.piece.white && step.piece instanceof Knight) return true;
+                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
             }
 
             if (!(Math.min(tile.y-1, tile.x-2) < 0)) {
                 step = board[tile.y-1][tile.x-2];
-                if (!step.isEmpty && !step.piece.white && step.piece instanceof Knight) return true;
+                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
             }
 
             if (!(Math.min(tile.y-2, tile.x-1) < 0)) {
                 step = board[tile.y-2][tile.x-1];
-                if (!step.isEmpty && !step.piece.white && step.piece instanceof Knight) return true;
+                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
             }
-        }
 
         return false;
     }
