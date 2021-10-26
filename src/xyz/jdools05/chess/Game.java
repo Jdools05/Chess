@@ -8,6 +8,7 @@ import java.util.Random;
 
 public class Game {
     Tile[][] board = new Tile[8][8];
+    Tile whiteKing, blackKing;
     int whiteScore, blackScore = 0;
     boolean isWhiteTurn = true;
 
@@ -52,6 +53,10 @@ public class Game {
         // Kings
         board[0][4] = new Tile(4, 0, new King(false));
         board[7][4] = new Tile(4, 7, new King(true));
+
+        // set the king tiles as well
+        whiteKing = board[7][4];
+        blackKing = board[0][4];
     }
 
     public Tile getTile(int x, int y) {
@@ -77,20 +82,32 @@ public class Game {
 
     public boolean isInCheck(Tile tile, boolean white) {
         Tile step;
+
+        // check from piece to left side of board
         for (int x = tile.x - 1; x >= 0; x--) {
+            // save current step (current Tile on check)
             step = board[tile.y][x];
+            // if there is no piece, skip check
             if (step.isEmpty) continue;
+            // if the piece is same color, this provides protection, skip
             if (step.piece.white == white) break;
+            // if there is a queen or rook, these are the only pieces that can take this direction.
             if (step.piece instanceof Queen || step.piece instanceof Rook) return true;
         }
 
-        for (int x = tile.x+1; x < 8; x++) {
+        // check from piece to right side of the board
+        for (int x = tile.x + 1; x < 8; x++) {
+            // save current step (current Tile on check)
             step = board[tile.y][x];
+            // if there is no piece, skip check
             if (step.isEmpty) continue;
+            // if the piece is same color, this provides protection, skip
             if (step.piece.white == white) break;
+            // if there is a queen or rook, these are the only pieces that can take this direction.
             if (step.piece instanceof Queen || step.piece instanceof Rook) return true;
         }
 
+        // check from piece to top of board
         for (int y = tile.y - 1; y >= 0; y--) {
             step = board[y][tile.x];
             if (step.isEmpty) continue;
@@ -98,94 +115,95 @@ public class Game {
             if (step.piece instanceof Queen || step.piece instanceof Rook) return true;
         }
 
-        for (int y = tile.y+1; y < 8; y++) {
+        // check from piece to bottom of board
+        for (int y = tile.y + 1; y < 8; y++) {
             step = board[y][tile.x];
             if (step.isEmpty) continue;
             if (step.piece.white == white) break;
             if (step.piece instanceof Queen || step.piece instanceof Rook) return true;
         }
 
-        for (int i = Math.min(tile.x, tile.y); i >= 0; i--) {
-            if (Math.max(tile.x - i, tile.y - i) > 8 || Math.min(tile.x - i, tile.y - i) < 0) break;
+        // check diagonally towards top left
+        for (int i = 0; i < Math.min(tile.x, tile.y); i++) {
             step = board[tile.y - i][tile.x - i];
             if (step.isEmpty) continue;
             if (step.piece.white == white) break;
             if (step.piece instanceof Queen || step.piece instanceof Bishop) return true;
         }
 
-        for (int i = Math.min(tile.x, tile.y); i >= 0; i--) {
-            if (Math.max(tile.x - i, tile.y + i) > 8 || Math.min(tile.x - i, tile.y + i) < 0) break;
-            step = board[tile.y + i][tile.x - i];
-            if (step.isEmpty) continue;
-            if (step.piece.white == white) break;
-            if (step.piece instanceof Queen || step.piece instanceof Bishop) return true;
-        }
-
-        for (int i = Math.max(tile.x, tile.y); i < 8; i++) {
-            if (Math.max(tile.x + i, tile.y - i) > 8 || Math.min(tile.x + i, tile.y - i) < 0) break;
+        // top right
+        for (int i = 0; i < Math.min(7 - tile.x, tile.y); i++) {
             step = board[tile.y - i][tile.x + i];
             if (step.isEmpty) continue;
             if (step.piece.white == white) break;
             if (step.piece instanceof Queen || step.piece instanceof Bishop) return true;
         }
 
-        for (int i = Math.max(tile.x, tile.y); i < 8; i++) {
-            if (Math.max(tile.x + i, tile.y + i) > 8 || Math.min(tile.x + i, tile.y + i) < 0) break;
+        // bottom right
+        for (int i = 0; i < Math.min(7 - tile.x, 7 - tile.y); i++) {
             step = board[tile.y + i][tile.x + i];
             if (step.isEmpty) continue;
             if (step.piece.white == white) break;
             if (step.piece instanceof Queen || step.piece instanceof Bishop) return true;
         }
 
-            if (!(!(Math.max(tile.y+(white ? -1 : 1), tile.x-1) > 7) || !(Math.min(tile.y+(white ? -1 : 1), tile.x-1) < 0))) {
-                step = board[tile.y+(white ? -1 : 1)]tile.x-1];
-                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Pawn) return true;
-            }
+        // bottom left
+        for (int i = 0; i < Math.min(tile.x, 7 - tile.y); i++) {
+            step = board[tile.y + i][tile.x - i];
+            if (step.isEmpty) continue;
+            if (step.piece.white == white) break;
+            if (step.piece instanceof Queen || step.piece instanceof Bishop) return true;
+        }
 
-            if (!(!(Math.max(tile.y+(white ? -1 : 1), tile.x+1) > 7) || !(Math.min(tile.y+(white ? -1 : 1), tile.x+1) < 0))) {
-                step = board[tile.y+(white ? -1 : 1)]tile.x+1];
-                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Pawn) return true;
-            }
+        if (!(!(Math.max(tile.y + (white ? -1 : 1), tile.x - 1) > 7) || !(Math.min(tile.y + (white ? -1 : 1), tile.x - 1) < 0))) {
+            step = board[tile.y + (white ? -1 : 1)][tile.x - 1];
+            if (!step.isEmpty && step.piece.white != white && step.piece instanceof Pawn) return true;
+        }
 
-            if (!(Math.max(tile.y+2, tile.x+1) > 7)) {
-                step = board[tile.y+2][tile.x+1];
-                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
-            }
+        if (!(!(Math.max(tile.y + (white ? -1 : 1), tile.x + 1) > 7) || !(Math.min(tile.y + (white ? -1 : 1), tile.x + 1) < 0))) {
+            step = board[tile.y + (white ? -1 : 1)][tile.x + 1];
+            if (!step.isEmpty && step.piece.white != white && step.piece instanceof Pawn) return true;
+        }
 
-            if (!(Math.max(tile.y+1, tile.x+2) > 7)) {
-                step = board[tile.y+1][tile.x+2];
-                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
-            }
+        if (!(Math.max(tile.y + 2, tile.x + 1) > 7)) {
+            step = board[tile.y + 2][tile.x + 1];
+            if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
+        }
 
-            if (!(!(Math.max(tile.y-1, tile.x+2) > 7) || !(Math.min(tile.y-1, tile.x+2) < 0))) {
-                step = board[tile.y-1][tile.x+2];
-                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
-            }
+        if (!(Math.max(tile.y + 1, tile.x + 2) > 7)) {
+            step = board[tile.y + 1][tile.x + 2];
+            if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
+        }
 
-            if (!(!(Math.max(tile.y-2, tile.x+1) > 7) || !(Math.min(tile.y-2, tile.x+1) < 0))) {
-                step = board[tile.y-2][tile.x+1];
-                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
-            }
+        if (!(!(Math.max(tile.y - 1, tile.x + 2) > 7) || !(Math.min(tile.y - 1, tile.x + 2) < 0))) {
+            step = board[tile.y - 1][tile.x + 2];
+            if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
+        }
 
-            if (!(!(Math.max(tile.y+2, tile.x-1) > 7) || !(Math.min(tile.y+2, tile.x-1) < 0))) {
-                step = board[tile.y+2][tile.x-1];
-                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
-            }
+        if (!(!(Math.max(tile.y - 2, tile.x + 1) > 7) || !(Math.min(tile.y - 2, tile.x + 1) < 0))) {
+            step = board[tile.y - 2][tile.x + 1];
+            if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
+        }
 
-            if (!(!(Math.max(tile.y+1, tile.x-2) > 7) || !(Math.min(tile.y+1, tile.x-2) < 0))) {
-                step = board[tile.y+1][tile.x-2];
-                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
-            }
+        if (!(!(Math.max(tile.y + 2, tile.x - 1) > 7) || !(Math.min(tile.y + 2, tile.x - 1) < 0))) {
+            step = board[tile.y + 2][tile.x - 1];
+            if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
+        }
 
-            if (!(Math.min(tile.y-1, tile.x-2) < 0)) {
-                step = board[tile.y-1][tile.x-2];
-                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
-            }
+        if (!(!(Math.max(tile.y + 1, tile.x - 2) > 7) || !(Math.min(tile.y + 1, tile.x - 2) < 0))) {
+            step = board[tile.y + 1][tile.x - 2];
+            if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
+        }
 
-            if (!(Math.min(tile.y-2, tile.x-1) < 0)) {
-                step = board[tile.y-2][tile.x-1];
-                if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
-            }
+        if (!(Math.min(tile.y - 1, tile.x - 2) < 0)) {
+            step = board[tile.y - 1][tile.x - 2];
+            if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
+        }
+
+        if (!(Math.min(tile.y - 2, tile.x - 1) < 0)) {
+            step = board[tile.y - 2][tile.x - 1];
+            if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
+        }
 
         return false;
     }
@@ -234,7 +252,8 @@ public class Game {
         // check movement
         if (piece.checkMoves(start, end, this)) {
 
-            System.out.println("Is White in check: " + isInCheck(board[7][4], isWhiteTurn));
+            System.out.println("Is black in check: " + isInCheck(blackKing, false));
+            System.out.println("Is white in check: " + isInCheck(whiteKing, true));
 
             // clear current tile
             start.piece = null;
@@ -250,6 +269,11 @@ public class Game {
             end.piece = piece;
 //            end.piece.hasMoved = true;
             end.isEmpty = false;
+
+            // if moving the king, update the kings position
+            if (isWhiteTurn) {
+                if (start == whiteKing) whiteKing = end;
+            } else if (start == blackKing) blackKing = end;
         }
 
         // change turns
