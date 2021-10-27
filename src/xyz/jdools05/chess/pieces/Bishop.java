@@ -15,7 +15,7 @@ public class Bishop extends Piece {
             int xOffset = end.x - start.x;
             int yOffset = end.y - start.y;
 
-            if ((int)Math.sqrt(Math.abs(xOffset * yOffset)) != Math.abs(xOffset)) throw new Exception("Illegal Move!");
+            if (xOffset == 0 || Math.abs(yOffset) / Math.abs(xOffset) != 1) throw new Exception("Illegal Move!");
 
 
             if (xOffset > 0 && yOffset > 0) for (int i = xOffset - 1; i != 0; i--) if (!game.getTile(i + start.x, i + start.y).isEmpty)  throw new Exception("Illegal Move!");

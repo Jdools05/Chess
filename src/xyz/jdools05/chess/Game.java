@@ -283,7 +283,7 @@ public class Game {
             end.isEmpty = false;
 
 
-        }
+        } else throw new Exception("Illegal Move!");
 
         // change turns
         isWhiteTurn = !isWhiteTurn;
