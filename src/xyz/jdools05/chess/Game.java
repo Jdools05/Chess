@@ -124,7 +124,7 @@ public class Game {
         }
 
         // check diagonally towards top left
-        for (int i = 0; i < Math.min(tile.x, tile.y); i++) {
+        for (int i = 1; i < Math.min(tile.x, tile.y); i++) {
             step = board[tile.y - i][tile.x - i];
             if (step.isEmpty) continue;
             if (step.piece.white == white) break;
@@ -132,7 +132,7 @@ public class Game {
         }
 
         // top right
-        for (int i = 0; i < Math.min(7 - tile.x, tile.y); i++) {
+        for (int i = 1; i < Math.min(7 - tile.x, tile.y); i++) {
             step = board[tile.y - i][tile.x + i];
             if (step.isEmpty) continue;
             if (step.piece.white == white) break;
@@ -140,7 +140,7 @@ public class Game {
         }
 
         // bottom right
-        for (int i = 0; i < Math.min(7 - tile.x, 7 - tile.y); i++) {
+        for (int i = 1; i < Math.min(7 - tile.x, 7 - tile.y); i++) {
             step = board[tile.y + i][tile.x + i];
             if (step.isEmpty) continue;
             if (step.piece.white == white) break;
@@ -148,19 +148,19 @@ public class Game {
         }
 
         // bottom left
-        for (int i = 0; i < Math.min(tile.x, 7 - tile.y); i++) {
+        for (int i = 1; i < Math.min(tile.x, 7 - tile.y); i++) {
             step = board[tile.y + i][tile.x - i];
             if (step.isEmpty) continue;
             if (step.piece.white == white) break;
             if (step.piece instanceof Queen || step.piece instanceof Bishop) return true;
         }
 
-        if (!(!(Math.max(tile.y + (white ? -1 : 1), tile.x - 1) > 7) || !(Math.min(tile.y + (white ? -1 : 1), tile.x - 1) < 0))) {
+        if (!(Math.min(tile.y + (white ? -1 : 1), tile.x - 1) < 0) && !(Math.max(tile.y + (white ? -1 : 1), tile.x - 1) > 7)) {
             step = board[tile.y + (white ? -1 : 1)][tile.x - 1];
             if (!step.isEmpty && step.piece.white != white && step.piece instanceof Pawn) return true;
         }
 
-        if (!(!(Math.max(tile.y + (white ? -1 : 1), tile.x + 1) > 7) || !(Math.min(tile.y + (white ? -1 : 1), tile.x + 1) < 0))) {
+        if (!(Math.min(tile.y + (white ? -1 : 1), tile.x + 1) < 0) && !(Math.max(tile.y + (white ? -1 : 1), tile.x + 1) > 7)) {
             step = board[tile.y + (white ? -1 : 1)][tile.x + 1];
             if (!step.isEmpty && step.piece.white != white && step.piece instanceof Pawn) return true;
         }
@@ -252,6 +252,18 @@ public class Game {
         // check movement
         if (piece.checkMoves(start, end, this)) {
 
+            // if moving the king, update the kings position
+            if (isWhiteTurn) {
+                if (start == whiteKing) whiteKing = end;
+            } else if (start == blackKing) blackKing = end;
+
+            // if results in check, return to previous state
+            if (isInCheck(isWhiteTurn ? whiteKing : blackKing, isWhiteTurn)) {
+                if (isWhiteTurn) whiteKing = start;
+                else blackKing = start;
+                throw new Exception("Illegal Move!");
+            }
+
             System.out.println("Is black in check: " + isInCheck(blackKing, false));
             System.out.println("Is white in check: " + isInCheck(whiteKing, true));
 
@@ -270,10 +282,7 @@ public class Game {
 //            end.piece.hasMoved = true;
             end.isEmpty = false;
 
-            // if moving the king, update the kings position
-            if (isWhiteTurn) {
-                if (start == whiteKing) whiteKing = end;
-            } else if (start == blackKing) blackKing = end;
+
         }
 
         // change turns
