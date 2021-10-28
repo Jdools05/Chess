@@ -3,7 +3,9 @@ package xyz.jdools05.chess;
 import xyz.jdools05.chess.Tile;
 import xyz.jdools05.chess.pieces.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class Game {
@@ -11,6 +13,8 @@ public class Game {
     Tile whiteKing, blackKing;
     int whiteScore, blackScore = 0;
     boolean isWhiteTurn = true;
+
+    List<Tile> enPassants = new ArrayList<>();
 
     public Game() {
         this.resetBoard();
@@ -80,7 +84,7 @@ public class Game {
         System.out.print(output);
     }
 
-    public boolean isInCheck(Tile tile, boolean white) {
+    public boolean isInCheck(Tile tile, boolean white, Tile[][] board) {
         Tile step;
 
         // check from piece to left side of board
@@ -248,28 +252,52 @@ public class Game {
         // get piece
         Piece piece = start.piece;
 
+
         if (piece.white != isWhiteTurn) throw new Exception("Invalid turn");
         // check movement
-        if (piece.checkMoves(start, end, this)) {
+        boolean enPassant = false;
+        if (piece instanceof Pawn) {
+            int xOffset = end.x - start.x;
+            int yOffset = end.y - start.y;
+            if (Math.abs(xOffset) == 1 && yOffset == (isWhiteTurn ? -1 : 1)) {
+                if (enPassants.contains(start) && enPassants.contains(end)) {
+                    enPassant = true;
+                    Tile tile = getTile(end.x, end.y + (isWhiteTurn ? 1 : -1));
+                    tile.isEmpty = true;
+                    if (isWhiteTurn) whiteScore += tile.piece.value;
+                    else blackScore += tile.piece.value;
+                    tile.piece = null;
+                }
+            }
+            enPassants = new ArrayList<>();
+            if (xOffset == 0 && yOffset == (isWhiteTurn ? -2 : 2)) {
+                enPassants.add(end.x != 0 ? getTile(end.x - 1, end.y) : null);
+                enPassants.add(end.x != 7 ? getTile(end.x + 1, end.y) : null);
+                enPassants.add(getTile(end.x, end.y + (isWhiteTurn ? 1 : -1)));
+            }
+
+        }
+        if (enPassant || piece.checkMoves(start, end, this)) {
 
             // if moving the king, update the kings position
             if (isWhiteTurn) {
                 if (start == whiteKing) whiteKing = end;
             } else if (start == blackKing) blackKing = end;
 
-            // if results in check, return to previous state
-            if (isInCheck(isWhiteTurn ? whiteKing : blackKing, isWhiteTurn)) {
+            Tile[][] preview = board;
+
+            preview[start.y][start.x].piece = null;
+            preview[start.y][start.x].isEmpty = true;
+
+            preview[end.y][end.x].piece = piece;
+            preview[end.y][end.x].piece.hasMoved = true;
+            preview[end.y][end.x].isEmpty = false;
+
+            if (isInCheck(isWhiteTurn ? whiteKing : blackKing, isWhiteTurn, preview)) {
                 if (isWhiteTurn) whiteKing = start;
                 else blackKing = start;
                 throw new Exception("Illegal Move!");
             }
-
-            System.out.println("Is black in check: " + isInCheck(blackKing, false));
-            System.out.println("Is white in check: " + isInCheck(whiteKing, true));
-
-            // clear current tile
-            start.piece = null;
-            start.isEmpty = true;
 
             // if capturing add points
             if (!board[end.y][end.x].isEmpty) {
@@ -277,11 +305,7 @@ public class Game {
                 else blackScore += board[end.y][end.x].piece.value;
             }
 
-            // set piece to new spot
-            end.piece = piece;
-//            end.piece.hasMoved = true;
-            end.isEmpty = false;
-
+            board = preview;
 
         } else throw new Exception("Illegal Move!");
 
