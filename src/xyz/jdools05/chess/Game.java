@@ -9,11 +9,19 @@ import java.util.List;
 import java.util.Random;
 
 public class Game {
+    // holds all the tiles in a 2d array
     Tile[][] board = new Tile[8][8];
+    
+    // stores the position of the whiteKing and blackKing
     Tile whiteKing, blackKing;
+    
+    // keeps the score for each side (May not be useful?)
     int whiteScore, blackScore = 0;
+    
+    // stores the current turn
     boolean isWhiteTurn = true;
 
+    // stores the valid moves for enPassant, clears at the end of each turn
     List<Tile> enPassants = new ArrayList<>();
 
     public Game() {
@@ -63,15 +71,20 @@ public class Game {
         blackKing = board[0][4];
     }
 
+    // returns the requested tile
     public Tile getTile(int x, int y) {
         return board[y][x];
     }
 
+    // displays the board in the console
     public void showBoard() {
         StringBuilder output = new StringBuilder();
 //        output.append("  1|2|3|4|5|6|7|8\n");
+        
+        // loop over each tile
         for (Tile[] tiles : board) {
             for (Tile tile : tiles) {
+                // format the console
                 if (tile.isEmpty) {
                     output.append(" |");
                     continue;
@@ -81,9 +94,11 @@ public class Game {
             }
             output.append("\n");
         }
+        // output to the console
         System.out.print(output);
     }
 
+    // checks to see if a tile is in check (can be used for any tile)
     public boolean isInCheck(Tile tile, boolean white, Tile[][] board) {
         Tile step;
 
@@ -159,56 +174,67 @@ public class Game {
             if (step.piece instanceof Queen || step.piece instanceof Bishop) return true;
         }
 
+        // check if there is a pawn checking in negative x
         if (!(Math.min(tile.y + (white ? -1 : 1), tile.x - 1) < 0) && !(Math.max(tile.y + (white ? -1 : 1), tile.x - 1) > 7)) {
             step = board[tile.y + (white ? -1 : 1)][tile.x - 1];
             if (!step.isEmpty && step.piece.white != white && step.piece instanceof Pawn) return true;
         }
 
+        // check if there is a pawn checking in positive x
         if (!(Math.min(tile.y + (white ? -1 : 1), tile.x + 1) < 0) && !(Math.max(tile.y + (white ? -1 : 1), tile.x + 1) > 7)) {
             step = board[tile.y + (white ? -1 : 1)][tile.x + 1];
             if (!step.isEmpty && step.piece.white != white && step.piece instanceof Pawn) return true;
         }
 
+        // check for knight moves
         if (!(Math.max(tile.y + 2, tile.x + 1) > 7)) {
             step = board[tile.y + 2][tile.x + 1];
             if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
         }
 
+        // check for knight moves
         if (!(Math.max(tile.y + 1, tile.x + 2) > 7)) {
             step = board[tile.y + 1][tile.x + 2];
             if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
         }
 
+        // check for knight moves
         if (!(!(Math.max(tile.y - 1, tile.x + 2) > 7) || !(Math.min(tile.y - 1, tile.x + 2) < 0))) {
             step = board[tile.y - 1][tile.x + 2];
             if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
         }
 
+        // check for knight moves
         if (!(!(Math.max(tile.y - 2, tile.x + 1) > 7) || !(Math.min(tile.y - 2, tile.x + 1) < 0))) {
             step = board[tile.y - 2][tile.x + 1];
             if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
         }
 
+        // check for knight moves
         if (!(!(Math.max(tile.y + 2, tile.x - 1) > 7) || !(Math.min(tile.y + 2, tile.x - 1) < 0))) {
             step = board[tile.y + 2][tile.x - 1];
             if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
         }
 
+        // check for knight moves
         if (!(!(Math.max(tile.y + 1, tile.x - 2) > 7) || !(Math.min(tile.y + 1, tile.x - 2) < 0))) {
             step = board[tile.y + 1][tile.x - 2];
             if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
         }
 
+        // check for knight moves
         if (!(Math.min(tile.y - 1, tile.x - 2) < 0)) {
             step = board[tile.y - 1][tile.x - 2];
             if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
         }
 
+        // check for knight moves
         if (!(Math.min(tile.y - 2, tile.x - 1) < 0)) {
             step = board[tile.y - 2][tile.x - 1];
             if (!step.isEmpty && step.piece.white != white && step.piece instanceof Knight) return true;
         }
 
+        // return false if no pieces are checking the tile
         return false;
     }
 
@@ -256,12 +282,19 @@ public class Game {
         if (piece.white != isWhiteTurn) throw new Exception("Invalid turn");
         // check movement
         boolean enPassant = false;
+        
+        // if we are moving a pawn, check for en passant
         if (piece instanceof Pawn) {
+            // calculate offset
             int xOffset = end.x - start.x;
             int yOffset = end.y - start.y;
+            // check movement restritions
             if (Math.abs(xOffset) == 1 && yOffset == (isWhiteTurn ? -1 : 1)) {
+                // if en passant is still valid
                 if (enPassants.contains(start) && enPassants.contains(end)) {
+                    // conduct en passant
                     enPassant = true;
+                    // remove piece on captured tile
                     Tile tile = getTile(end.x, end.y + (isWhiteTurn ? 1 : -1));
                     tile.isEmpty = true;
                     if (isWhiteTurn) whiteScore += tile.piece.value;
@@ -269,7 +302,10 @@ public class Game {
                     tile.piece = null;
                 }
             }
+            // clear en passant
             enPassants = new ArrayList<>();
+            
+            // if moved 2 tiles forward populate en passant moves list
             if (xOffset == 0 && yOffset == (isWhiteTurn ? -2 : 2)) {
                 enPassants.add(end.x != 0 ? getTile(end.x - 1, end.y) : null);
                 enPassants.add(end.x != 7 ? getTile(end.x + 1, end.y) : null);
@@ -277,6 +313,7 @@ public class Game {
             }
 
         }
+        // if conducting en passant or if valid move
         if (enPassant || piece.checkMoves(start, end, this)) {
 
             // if moving the king, update the kings position
@@ -284,8 +321,10 @@ public class Game {
                 if (start == whiteKing) whiteKing = end;
             } else if (start == blackKing) blackKing = end;
 
+            // store a copy of the board
             Tile[][] preview = board;
 
+            // update the preview to make the move
             preview[start.y][start.x].piece = null;
             preview[start.y][start.x].isEmpty = true;
 
