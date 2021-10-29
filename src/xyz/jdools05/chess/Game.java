@@ -328,10 +328,21 @@ public class Game {
             preview[start.y][start.x].piece = null;
             preview[start.y][start.x].isEmpty = true;
 
+            // update the preview to make the move
             preview[end.y][end.x].piece = piece;
             preview[end.y][end.x].piece.hasMoved = true;
             preview[end.y][end.x].isEmpty = false;
 
+            // if moving a pawn, check for promotion
+            if (piece instanceof Pawn) {
+                // if is in the final row, promote to queen
+                // TODO: add promotion to rook, knight, bishop
+                if (end.y == (isWhiteTurn ? 7 : 0)) {
+                    preview[end.y][end.x].piece = new Queen(isWhiteTurn);
+                }
+            }
+
+            // the king results in check, the move is invalid
             if (isInCheck(isWhiteTurn ? whiteKing : blackKing, isWhiteTurn, preview)) {
                 if (isWhiteTurn) whiteKing = start;
                 else blackKing = start;
@@ -344,6 +355,9 @@ public class Game {
                 else blackScore += board[end.y][end.x].piece.value;
             }
 
+
+
+            // make the move
             board = preview;
 
         } else throw new Exception("Illegal Move!");

@@ -17,6 +17,7 @@ public class King extends Piece{
 
             // attempting to castle
             if (Math.abs(xOffset) == 2 && yOffset == 0 && !this.hasMoved && !(xOffset < 0 ? game.getTile(0, start.y).isEmpty || game.getTile(0, start.y).piece.hasMoved : game.getTile(7, start.y).isEmpty || game.getTile(7, start.y).piece.hasMoved)) {
+                // check if there are pieces between the king and the rook
                 if (xOffset < 0) {
                     if (!game.getTile(3, start.y).isEmpty) throw new Exception("Illegal Move!");
                     if (!game.getTile(2, start.y).isEmpty) throw new Exception("Illegal Move!");

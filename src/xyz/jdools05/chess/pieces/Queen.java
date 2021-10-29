@@ -19,7 +19,9 @@ public class Queen extends Piece {
             // make sure it is only in one direction
             if (!(xOffset * yOffset == 0 && !(xOffset == 0 && yOffset == 0)) && (int)Math.sqrt(Math.abs(xOffset * yOffset)) != Math.abs(xOffset)) throw new Exception("Illegal Move!");
 
+            // if we are moving in a straight line
             if (xOffset * yOffset == 0) {
+                // check if path is clear
                 if (xOffset < 0) for (int i = xOffset + 1; i != 0; i++)
                     if (!game.getTile(start.x + i, start.y).isEmpty) throw new Exception("Illegal Move!");
                 if (xOffset > 0) for (int i = xOffset - 1; i != 0; i--)
@@ -29,6 +31,7 @@ public class Queen extends Piece {
                 if (yOffset > 0) for (int i = yOffset - 1; i != 0; i--)
                     if (!game.getTile(start.x, start.y + i).isEmpty) throw new Exception("Illegal Move!");
             } else {
+                // check if path is clear
                 if (xOffset > 0 && yOffset > 0) for (int i = xOffset - 1; i != 0; i--) if (!game.getTile(i + start.x, i + start.y).isEmpty)  throw new Exception("Illegal Move!");
                 if (xOffset < 0 && yOffset > 0) for (int i = xOffset + 1; i != 0; i++) if (!game.getTile(i + start.x, -i + start.y).isEmpty)  throw new Exception("Illegal Move!");
                 if (xOffset < 0 && yOffset < 0) for (int i = xOffset + 1; i != 0; i++) if (!game.getTile(i + start.x, i + start.y).isEmpty)  throw new Exception("Illegal Move!");

@@ -20,8 +20,10 @@ public class Pawn extends Piece {
             int xOffset = end.x - start.x;
             int yOffset = end.y - start.y;
 
+            // save valid moves
             List<String> validOffsetPairs = new ArrayList<>();
 
+            // set valid moves
             if (!this.white) {
                 validOffsetPairs.add(Arrays.toString(new int[]{-1, 1}));
                 validOffsetPairs.add(Arrays.toString(new int[]{0, 1}));
@@ -34,6 +36,7 @@ public class Pawn extends Piece {
                 if (!this.hasMoved) validOffsetPairs.add(Arrays.toString(new int[]{0, -2}));
             }
 
+            // check if the move is valid
             if (!validOffsetPairs.contains(Arrays.toString(new int[]{xOffset, yOffset}))) throw new Exception("Illegal Move!");
             if (xOffset == 0 && yOffset == (this.white ? -1 : 1) && !end.isEmpty) throw new Exception("Illegal Move!");
             if (xOffset == 0 && yOffset == (this.white ? -2 : 2) && (!end.isEmpty || !board.getTile(start.x, start.y + (this.white ? -1 : 1)).isEmpty)) throw new Exception("Illegal Move!");

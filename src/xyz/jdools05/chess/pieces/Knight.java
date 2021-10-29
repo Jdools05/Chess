@@ -15,6 +15,7 @@ public class Knight extends Piece{
             int xOffset = end.x - start.x;
             int yOffset = end.y - start.y;
 
+            // check if the movement is valid
             if (Math.abs(xOffset * yOffset) != 2) throw new Exception("Illegal Move!");
 
             return true;
