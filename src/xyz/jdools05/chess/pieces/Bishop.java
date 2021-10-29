@@ -4,10 +4,12 @@ import xyz.jdools05.chess.Game;
 import xyz.jdools05.chess.Tile;
 
 public class Bishop extends Piece {
+    // constructor
     public Bishop(boolean white) {
         super(white, 3, 'B');
     }
 
+    // method to determine if a move is valid
     @Override
     public boolean checkMoves(Tile start, Tile end, Game game) throws Exception {
         if (this.verifySpots(start, end)) {

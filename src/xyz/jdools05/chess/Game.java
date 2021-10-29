@@ -251,8 +251,12 @@ public class Game {
     // example: "e2-e4" or "52-54"
     // This would move the King's pawn forward 2 spaces
     // You do not have to specify piece
+    // however, if promotion is needed, you must specify the promotion piece
+    // example: "e7-e8Q"
     public void makeMove(String move) throws Exception {
-        if (move.length() != 5) throw new Exception("Invalid format");
+
+        // if the move is not in the correct format
+        if (move.length() != 5 && move.length() != 6) throw new Exception("Invalid format");
         // format data
         move = move.toLowerCase();
         move = move.replaceAll("a", "1");
@@ -272,6 +276,28 @@ public class Game {
         Tile start = board[8 - Integer.parseInt(components[0].substring(1))][Integer.parseInt(components[0].substring(0, 1)) - 1];
         Tile end = board[8 - Integer.parseInt(components[1].substring(1))][Integer.parseInt(components[1].substring(0, 1)) - 1];
 
+        Piece promotion = null;
+        // if the move is a promotion
+        if (components.length == 6) {
+            char charPromotion = components[2].charAt(2);
+            switch (charPromotion) {
+                case 'q':
+                    promotion = new Queen(isWhiteTurn);
+                    break;
+                case 'r':
+                    promotion = new Rook(isWhiteTurn);
+                    break;
+                case 'b':
+                    promotion = new Bishop(isWhiteTurn);
+                    break;
+                case 'n':
+                    promotion = new Knight(isWhiteTurn);
+                    break;
+                default:
+                    throw new Exception("Invalid promotion piece");
+            }
+        }
+
         // if not valid piece to move
         if (start.isEmpty) throw new Exception("Invalid piece");
 
@@ -288,7 +314,7 @@ public class Game {
             // calculate offset
             int xOffset = end.x - start.x;
             int yOffset = end.y - start.y;
-            // check movement restritions
+            // check movement restrictions
             if (Math.abs(xOffset) == 1 && yOffset == (isWhiteTurn ? -1 : 1)) {
                 // if en passant is still valid
                 if (enPassants.contains(start) && enPassants.contains(end)) {
@@ -335,10 +361,9 @@ public class Game {
 
             // if moving a pawn, check for promotion
             if (piece instanceof Pawn) {
-                // if is in the final row, promote to queen
-                // TODO: add promotion to rook, knight, bishop
+                // if is in the final row, promote
                 if (end.y == (isWhiteTurn ? 7 : 0)) {
-                    preview[end.y][end.x].piece = new Queen(isWhiteTurn);
+                    preview[end.y][end.x].piece = promotion;
                 }
             }
 
