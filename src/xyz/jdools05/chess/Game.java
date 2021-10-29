@@ -274,7 +274,7 @@ public class Game {
 
         // get respective tiles
         Tile start = board[8 - Integer.parseInt(components[0].substring(1))][Integer.parseInt(components[0].substring(0, 1)) - 1];
-        Tile end = board[8 - Integer.parseInt(components[1].substring(1))][Integer.parseInt(components[1].substring(0, 1)) - 1];
+        Tile end = board[8 - Integer.parseInt(components[1].substring(1,2))][Integer.parseInt(components[1].substring(0, 1)) - 1];
 
         Piece promotion = null;
         // if the move is a promotion
@@ -362,13 +362,14 @@ public class Game {
             // if moving a pawn, check for promotion
             if (piece instanceof Pawn) {
                 // if is in the final row, promote
-                if (end.y == (isWhiteTurn ? 7 : 0)) {
+                if (end.y == (isWhiteTurn ? 0 : 7)) {
                     preview[end.y][end.x].piece = promotion;
                 }
             }
 
             // the king results in check, the move is invalid
             if (isInCheck(isWhiteTurn ? whiteKing : blackKing, isWhiteTurn, preview)) {
+                // revert the board
                 if (isWhiteTurn) whiteKing = start;
                 else blackKing = start;
                 throw new Exception("Illegal Move!");
@@ -379,8 +380,6 @@ public class Game {
                 if (isWhiteTurn) whiteScore += board[end.y][end.x].piece.value;
                 else blackScore += board[end.y][end.x].piece.value;
             }
-
-
 
             // make the move
             board = preview;
