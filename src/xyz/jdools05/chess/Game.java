@@ -24,6 +24,9 @@ public class Game {
     // stores the valid moves for enPassant, clears at the end of each turn
     List<Tile> enPassants = new ArrayList<>();
 
+    // stores if the game is over
+    boolean isGameOver = false;
+
     public Game() {
         this.resetBoard();
     }
