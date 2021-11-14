@@ -31,6 +31,10 @@ public class Game {
         this.resetBoard();
     }
 
+    public boolean isWhiteTurn() {
+        return isWhiteTurn;
+    }
+
     public void setGameOver(boolean isGameOver) {
         this.isGameOver = isGameOver;
     }
