@@ -31,6 +31,10 @@ public class Game {
         this.resetBoard();
     }
 
+    public void setGameOver(boolean isGameOver) {
+        this.isGameOver = isGameOver;
+    }
+
     public void resetBoard() {
         // set up pawns and clear spaces
         for (int y = 0; y < 8; y++) {
